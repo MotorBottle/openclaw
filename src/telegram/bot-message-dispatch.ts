@@ -822,7 +822,16 @@ export const dispatchTelegramMessage = async ({
       removeAfterReply: removeAckAfterReply,
       ackReactionPromise,
       ackReactionValue: ackReactionPromise ? "ack" : null,
-      remove: () => reactionApi?.(chatId, msg.message_id ?? 0, []) ?? Promise.resolve(),
+      remove: () => {
+        const msgId = msg.message_id;
+        if (!msgId || msgId === 0) {
+          logVerbose(
+            `telegram: cannot remove ack - invalid message_id ${msgId} for chat ${chatId}`,
+          );
+          return Promise.resolve();
+        }
+        return reactionApi?.(chatId, msgId, []) ?? Promise.resolve();
+      },
       onError: (err) => {
         if (!msg.message_id) {
           return;
