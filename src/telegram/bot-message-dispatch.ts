@@ -823,6 +823,11 @@ export const dispatchTelegramMessage = async ({
       void (async () => {
         await sleep(2000);
         await statusReactionController.clear();
+        // Force actual Telegram API removal (the direct way)
+        const msgId = msg.message_id;
+        if (msgId && msgId !== 0) {
+          await reactionApi?.(chatId, msgId, []);
+        }
       })();
     }
   } else {
